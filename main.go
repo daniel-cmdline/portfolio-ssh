@@ -124,9 +124,9 @@ func handleConnection(conn net.Conn) {
             		cursor = 0 // Se passou do final, reseta pro topo!
         			} 
     			} 
-				}
-			continue
 			}
+			continue
+		}
 
 		// Abre o menu se a sequencia for 10 ou 13
 		if b == 10 || b == 13 {
