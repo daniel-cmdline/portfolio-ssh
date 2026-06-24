@@ -28,6 +28,14 @@ type UIProject struct {
 	TechStack   []string
 }
 
+// Escreve devagar no terminal, aceita o io.Writer, o texto e o delay
+func Typewriter(w io.Writer, text string, delay time.Duration) {
+	for _, char := range text {
+		w.Write([]byte(string(char)))
+		time.Sleep(delay)
+	}
+}
+
 // DrawMatrixIntro aceita qualquer coisa que leia e escreva (io.ReadWriter)
 func DrawMatrixIntro(w io.ReadWriter) {
 	w.Write([]byte("\033[2J\033[H"))
@@ -121,7 +129,6 @@ func DrawCommsEnvelopeBottom(w io.Writer) {
 	w.Write([]byte("         \033[1;33m└─────────────────────────────────────────────────────────────┘\033[0m\r\n"))
 }
 
-// DrawAboutMe restaurado com efeito Typewriter letra por letra!
 func DrawAboutMe(w io.Writer, name string, age int, role string, edu string, stack []string, certs []string) {
 	Typewriter(w, "\033[1;36m┌── [ DECRYPTED OPERATIVE DOSSIER ] ──────────────────────────────────────────────┐\033[0m\r\n", 3*time.Millisecond)
 	
@@ -132,7 +139,6 @@ func DrawAboutMe(w io.Writer, name string, age int, role string, edu string, sta
 	
 	Typewriter(w, "\033[1;36m├── [ CORE OPERATIONS & PROFILE OVERVIEW ] ───────────────────────────────────────┤\033[0m\r\n", 3*time.Millisecond)
 	
-	// Logs de sistema escovando as suas reais habilidades
 	Typewriter(w, "  \033[1;30m[sys/init]\033[0m \033[1;32mNATIVE LINUX USER\033[0m -> Dominio de ambiente Unix, Shell Scripting e automacao.\r\n", 6*time.Millisecond)
 	Typewriter(w, "  \033[1;30m[sys/net] \033[0m \033[1;34mNETWORK INFRASTRUCTURE\033[0m -> Arquitetura de Redes, Protocolos TCP/IP e roteamento.\r\n", 6*time.Millisecond)
 	Typewriter(w, "  \033[1;30m[sys/core]\033[0m \033[1;33mBACKEND SPECIALIST\033[0m -> Construcao de APIs HTTP robustas, servicos em Go e Node.\r\n", 6*time.Millisecond)
@@ -154,7 +160,6 @@ func DrawAboutMe(w io.Writer, name string, age int, role string, edu string, sta
 	Typewriter(w, "\033[1;36m└─────────────────────────────────────────────────────────────────────────────────┘\r\n", 3*time.Millisecond)
 }
 
-// DrawProjects restaurado com efeito Typewriter bloco a bloco!
 func DrawProjects(w io.Writer, projects []UIProject) {
 	Typewriter(w, "\033[1;36m┌── [ LOCAL DATABASE SECTORS - PRODUCTION DEPLOYS ] ─────────────────────────────┐\033[0m\r\n", 4*time.Millisecond)
 	
@@ -191,7 +196,6 @@ func FetchAndDrawGitHub(w io.Writer, username string) {
 	}
 	defer respRepos.Body.Close()
 	var repos []GitHubRepo
-	// FIX: Alimentando a struct com os dados reais trafegados no cabo
 	json.NewDecoder(respRepos.Body).Decode(&repos)
 
 	w.Write([]byte("\033[1;32m[✓] SECTOR SYNCHRONIZED! RENDERING DATAFEED...\033[0m\r\n\r\n"))
@@ -212,13 +216,6 @@ func FetchAndDrawGitHub(w io.Writer, username string) {
 		Typewriter(w, textoRepo, 10*time.Millisecond)
 	}
 	w.Write([]byte("\033[1;36m└─────────────────────────────────────────────────────────────────────────────────┘\r\n"))
-}
-
-func Typewriter(w io.Writer, text string, delay time.Duration) {
-	for _, char := range text {
-		w.Write([]byte(string(char)))
-		time.Sleep(delay)
-	}
 }
 
 func DrawCyberBanner(w io.Writer) {

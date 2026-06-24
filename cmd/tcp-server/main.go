@@ -21,17 +21,17 @@ type Profile struct {
 	Education      string
 	Stack          []string
 	Certifications []string
-	Projects       []ui.UIProject 
+	Projects       []ui.UIProject // FIX: Usando o tipo correto do pacote ui
 }
 
 func getMyProfile() Profile {
-	p1 := ui.UIProject{
+	p1 := ui.UIProject{ // FIX: Instanciando como ui.UIProject
 		Name:        "Seguramos",
 		Description: "Plataforma full-stack de corretagem de seguros digital corporativa.",
 		TechStack:   []string{"React", "Typescript", "Node.js", "PostgreSQL"},
 	}
 
-	p2 := ui.UIProject{
+	p2 := ui.UIProject{ // FIX: Instanciando como ui.UIProject
 		Name:        "Go TUI Portfolio",
 		Description: "Servidor SSH concorrente multiplataforma assíncrono e criptografado escrito do zero.",
 		TechStack:   []string{"Go", "SSH Protocol", "RFC 4251", "Cryptography", "Linux Kernel"},
@@ -76,9 +76,9 @@ func handleSSHChannel(ch ssh.Channel, requests <-chan *ssh.Request) {
 	profile := getMyProfile()
 	menuItems := []string{
 		"👤 [1] DECRYPT PROFILE (SOBRE MIM)",
-		"🐙 [2] SYNC GITHUB NODE (LIVE DATA)",
-		"💾 [3] ACCESS DATABASE (PROJETOS)",
-		"📡 [4] ESTABLISH COMS (ENTRAR EM CONTATO)",
+		"🐙 [2] SYNC GITHUB (REPOSITORIOS PUBLICOS)",
+		"💾 [3] ACCESS DATABASE (PROJETOS EM PRODUÇÃO)",
+		"📨 [4] ESTABLISH CONTACT (ENVIA UM E-MAIL VIA ENDPOINT HTTP)",
 		"❌ [5] TERMINATE SESSION (SAIR)",
 	}
 	cursor := 0
@@ -91,9 +91,9 @@ func handleSSHChannel(ch ssh.Channel, requests <-chan *ssh.Request) {
 		ch.Write([]byte("\033[1;32m┌── SELECT DESTINATION PROTOCOL ──────────────────────────────────────────────────┐\r\n"))
 		for idx, item := range menuItems {
 			if idx == cursor {
-				ch.Write([]byte(fmt.Sprintf("│  \033[1;30;106m ➔ %-76s \033[0m│\r\n", item)))
+				ch.Write([]byte(fmt.Sprintf("  \033[1;30;106m ➔ %-76s \033[0m\r\n", item)))
 			} else {
-				ch.Write([]byte(fmt.Sprintf("│     \033[0;32m%-76s\033[0m │\r\n", item)))
+				ch.Write([]byte(fmt.Sprintf("     \033[0;32m%-76s\033[0m \r\n", item)))
 			}
 		}
 		ch.Write([]byte("\033[1;32m└─────────────────────────────────────────────────────────────────────────────────┘\r\n\033[0m"))
@@ -170,7 +170,6 @@ func handleSSHChannel(ch ssh.Channel, requests <-chan *ssh.Request) {
 func main() {
 	// 1. Configura os parâmetros globais do protocolo SSH
 	config := &ssh.ServerConfig{
-		// Permite conexões anônimas sem checagem de senhas (portfólio público)
 		PasswordCallback: func(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
 			return nil, nil
 		},
@@ -180,7 +179,7 @@ func main() {
 	// 2. Carrega a Host Key RSA gerada pelo ssh-keygen
 	privateBytes, err := os.ReadFile("id_rsa")
 	if err != nil {
-		log.Fatalf("Falha crítica: arquivo de chave 'id_rsa' ausente na raiz! Execute: ssh-keygen -t rsa -b 2048 -f id_rsa -N \"\" -> Erro: %v", err)
+		log.Fatalf("Falha crítica: arquivo de chave 'id_rsa' ausente na raiz! Erro: %v", err)
 	}
 
 	private, err := ssh.ParsePrivateKey(privateBytes)
@@ -210,7 +209,6 @@ func main() {
 
 		// 4. Goroutine concorrente para isolar o handshake SSH de cada terminal conectado
 		go func(c net.Conn) {
-			// Executa a negociação criptográfica (Handshake) em cima do cano TCP aceito
 			sshConn, chans, reqs, err := ssh.NewServerConn(c, config)
 			if err != nil {
 				c.Close()
@@ -218,21 +216,17 @@ func main() {
 			}
 			go ssh.DiscardRequests(reqs)
 
-			// Escuta as requisições de sub-canais gerados pelo cliente SSH
 			for newChannel := range chans {
-				// Rejeita qualquer canal que não seja do tipo de terminal clássico ("session")
 				if newChannel.ChannelType() != "session" {
 					newChannel.Reject(ssh.UnknownChannelType, "unknown channel type")
 					continue
 				}
 
-				// Aceita o canal de sessão e recupera a ponte estável de I/O
 				ch, requests, err := newChannel.Accept()
 				if err != nil {
 					continue
 				}
 
-				// Passa o canal criptografado para carregar a TUI de forma isolada
 				go handleSSHChannel(ch, requests)
 			}
 			sshConn.Close()
