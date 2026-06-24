@@ -23,23 +23,39 @@ type GitHubRepo struct {
 	Stargazers  int    `json:"stargazers_count"`
 }
 
+// DrawCommsEnvelopeTop renderiza a parte superior e cabeçalho do envelope cyberpunk
+func DrawCommsEnvelopeTop(conn net.Conn) {
+	conn.Write([]byte("\033[1;35m  📡 COM-LINK DETECTED // SECURE INBOUND CHANNEL // ROUTING: DANIEL_CORE\033[0m\r\n"))
+	conn.Write([]byte("\033[1;30m  ─────────────────────────────────────────────────────────────────────────────────\033[0m\r\n\r\n"))
+
+	// O Desenho do Envelope ASCII (O topo da carta)
+	conn.Write([]byte("         \033[1;33m┌─────────────────────────────────────────────────────────────┐\033[0m\r\n"))
+	conn.Write([]byte("         \033[1;33m│\033[0m  \033[1;34m✉️  DIGITAL ENVELOPE (ESTABLISH COMMUNICATIONS)\033[0m            \033[1;33m│\033[0m\r\n"))
+	conn.Write([]byte("         \033[1;33m├─────────────────────────────────────────────────────────────┤\033[0m\r\n"))
+	conn.Write([]byte("         \033[1;33m│\033[0m                                                             \033[1;33m│\033[0m\r\n"))
+}
+
+// DrawCommsEnvelopeBottom renderiza o fundo do envelope selado
+func DrawCommsEnvelopeBottom(conn net.Conn) {
+	conn.Write([]byte("         \033[1;33m│\033[0m                                                             \033[1;33m│\033[0m\r\n"))
+	conn.Write([]byte("         \033[1;33m└─────────────────────────────────────────────────────────────┘\033[0m\r\n"))
+}
+
 // FetchAndDrawGitHub puxa usuário + repositórios recentes e desenha com ASCII Art do Octocat
 func FetchAndDrawGitHub(conn net.Conn, username string) {
 	conn.Write([]byte("\033[1;33m[!] CONNECTING TO CORE GITHUB API NODE...\033[0m\r\n"))
 
 	client := &http.Client{Timeout: 6 * time.Second}
 
-	// 1. Pega dados do Usuário
 	respUser, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s", username))
 	if err != nil || respUser.StatusCode != 200 {
 		conn.Write([]byte("\033[1;31m[💥] ERROR: UNABLE TO FETCH USER NODE\033[0m\r\n"))
 		return
 	}
-	defer respUser.Body.Close() // <-- LINHA CORRIGIDA AQUI!
+	defer respUser.Body.Close()
 	var user GitHubUser
 	json.NewDecoder(respUser.Body).Decode(&user)
 
-	// 2. Pega os 3 repositórios mais recentes
 	respRepos, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s/repos?sort=updated&per_page=3", username))
 	if err != nil || respRepos.StatusCode != 200 {
 		conn.Write([]byte("\033[1;31m[💥] ERROR: UNABLE TO FETCH REPOSITORIES NODE\033[0m\r\n"))
@@ -52,10 +68,7 @@ func FetchAndDrawGitHub(conn net.Conn, username string) {
 	conn.Write([]byte("\033[1;32m[✓] SECTOR SYNCHRONIZED! RENDERING DATAFEED...\033[0m\r\n\r\n"))
 	time.Sleep(200 * time.Millisecond)
 
-	// ASCII Art do Octocat + Bloco de Informações do Usuário
 	conn.Write([]byte("\033[1;36m┌── [ GITHUB REMOTE TELEMETRY ] ──────────────────────────────────────────────────┐\033[0m\r\n"))
-	
-	// Printando dados básicos junto com a silhueta do Octocat
 	conn.Write([]byte("  \033[1;35m  _(\\ _/)_ \033[0m    \033[1;32mOPERATIVE:\033[0m  " + user.Login + "\r\n"))
 	conn.Write([]byte("  \033[1;35m ((  \"  )) \033[0m    \033[1;32mNET REPOS:\033[0m  " + fmt.Sprintf("%d Public Units", user.PublicRepos) + "\r\n"))
 	conn.Write([]byte("  \033[1;35m  /\\-V-/\\  \033[0m    \033[1;32mFOLLOWERS:\033[0m  " + fmt.Sprintf("%d Active Nodes", user.Followers) + "\r\n"))
@@ -64,7 +77,6 @@ func FetchAndDrawGitHub(conn net.Conn, username string) {
 	conn.Write([]byte("\033[1;36m├─────────────────────────────────────────────────────────────────────────────────┤\033[0m\r\n"))
 	conn.Write([]byte("  \033[1;33m📡 LIVE DEPLOYMENTS (RECENTLY UPDATED ON GITHUB):\033[0m\r\n"))
 
-	// Loop para varrer e printar os repositórios reais da nuvem!
 	for _, repo := range repos {
 		desc := repo.Description
 		if desc == "" {
@@ -88,15 +100,13 @@ func Typewriter(conn net.Conn, text string, delay time.Duration) {
 	}
 }
 
-// DrawCyberBanner cospe um logo gigante em ASCII Art com o nome de guerra DEFINITIVO
+// DrawCyberBanner cospe um logo gigante em ASCII Art
 func DrawCyberBanner(conn net.Conn) {
-	// Cores Neon de alta intensidade
 	green := "\033[1;92m"
 	cyan  := "\033[1;96m"
 	gray  := "\033[90m"
 	reset := "\033[0m"
 
-	// ASCII ART: DANIEL CMD LINE (Letras totalmente isoladas e limpas)
 	conn.Write([]byte(green + "  ____   _   _   _ ___ _____ _       ____ __  __ ____   _     ___ _   _ _____\r\n" + reset))
 	conn.Write([]byte(green + " |  _ \\ /_\\ | \\ | |_ _| ____| |     / ___|  \\/  |  _ \\  | |   |_ _| \\ | | ____|\r\n" + reset))
 	conn.Write([]byte(cyan  + " | | | / _ \\|  \\| | | ||  _| | |    | |   | |\\/| | | | | | |    | ||  \\| |  _|  \r\n" + reset))
