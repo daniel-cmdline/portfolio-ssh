@@ -2,10 +2,6 @@ package main
 
 import (
 	//std libs
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"log"
 	"net"
@@ -19,42 +15,10 @@ import (
 	"portfolio-ssh/functions"
 )
 
-
-func loadHostKey() (ssh.Signer, error) {
-	hostKeyPath := os.Getenv("SSH_HOST_KEY_PATH")
-	if hostKeyPath == "" {
-		hostKeyPath = "id_rsa"
-	}
-
-	privateBytes, err := os.ReadFile(hostKeyPath)
-	if err == nil {
-		return ssh.ParsePrivateKey(privateBytes)
-	}
-	if !os.IsNotExist(err) {
-		return nil, fmt.Errorf("failed to read host key %q: %w", hostKeyPath, err)
-	}
-
-	log.Printf("Host key %q not found; generating ephemeral SSH host key for this process.", hostKeyPath)
-	return generateEphemeralHostKey()
-}
-
-func generateEphemeralHostKey() (ssh.Signer, error) {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate ephemeral host key: %w", err)
-	}
-
-	pemBytes := pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
-	})
-
-	return ssh.ParsePrivateKey(pemBytes)
-}
-
 func main() {
-	//Load env
-	err := godotenv.Load()
+	// Load env (Popula o processo com os dados do .env antes de tudo)
+	_ = godotenv.Load()
+
 	// 1. Configura os parâmetros globais do protocolo SSH
 	config := &ssh.ServerConfig{
 		PasswordCallback: func(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
@@ -63,12 +27,11 @@ func main() {
 		NoClientAuth: true,
 	}
 
-	// 2. Carrega a Host Key SSH de arquivo ou gera uma chave efêmera para containers.
-	private, err := loadHostKey()
+	// 2. Carrega a Host Key SSH isolada no pacote functions (disco ou efêmera)
+	private, err := functions.LoadHostKey()
 	if err != nil {
 		log.Fatalf("Falha crítica ao preparar a Host Key privada: %v", err)
 	}
-	
 	config.AddHostKey(private)
 
 	// 3. Lê dinamicamente a porta definida no ambiente ou assume a 2222 por padrão
@@ -77,14 +40,12 @@ func main() {
 		port = "2222"
 	}
 
-	//abre o socket em todas as interfaces
+	// Abre o socket em todas as interfaces
 	listenAddr := fmt.Sprintf("0.0.0.0:%s", port)
 	listener, err := net.Listen("tcp", listenAddr)
-
 	if err != nil {
 		log.Fatalf("Erro ao abrir socket: %v", err)
 	}
-
 	defer listener.Close()
 	log.Printf("Iniciando Servidor Criptografado SSH em %s...\n", listenAddr)
 
@@ -130,6 +91,7 @@ func main() {
 					continue
 				}
 
+				// Roda a TUI cyberpunk isolada do pacote functions
 				go functions.HandleSSHChannel(ch, requests)
 			}
 			sshConn.Close()
