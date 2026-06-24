@@ -68,6 +68,7 @@ func handleConnection(conn net.Conn) {
 	}
 	cursor := 0
 
+	//Otimizador de leitura de rede que impede seu servidor de engasgar fazendo requisições em excesso pro Kernel
 	reader := bufio.NewReader(conn)
 
 	for {
@@ -95,6 +96,8 @@ func handleConnection(conn net.Conn) {
 		// FIRULA 2: Barra de Status Estilo Tmux/LazyVim no rodapé
 		ui.DrawStatusBar(conn, menuItems[cursor][4:])
 
+
+		//A mecânica de cima e baixo e rederização interceptando da sequencia de bytes ASCII digitados no terminal do usuario 
 		b, err := reader.ReadByte()
 		if err != nil {
 			break
@@ -104,14 +107,28 @@ func handleConnection(conn net.Conn) {
 		if b == 27 {
 			b2, _ := reader.ReadByte()
 			b3, _ := reader.ReadByte()
-			if b2 == 91 {
-				if b3 == 65 { if cursor > 0 { cursor-- } } // CIMA
-				if b3 == 66 { if cursor < len(menuItems)-1 { cursor++ } } // BAIXO
-			}
-			continue
-		}
 
-		// Seleção com Enter
+			if b2 == 91 {
+    			if b3 == 65 { // Seta para CIMA
+        			if cursor > 0 { 
+            		cursor-- 
+        			} else { 
+           			 cursor = len(menuItems) - 1 // Se passou do topo, pula pro final!
+        			} 
+    			} 
+
+    			if b3 == 66 { // Seta para BAIXO
+        			if cursor < len(menuItems)-1 { 
+            		cursor++ 
+        			} else { 
+            		cursor = 0 // Se passou do final, reseta pro topo!
+        			} 
+    			} 
+				}
+			continue
+			}
+
+		// Abre o menu se a sequencia for 10 ou 13
 		if b == 10 || b == 13 {
 			conn.Write([]byte("\033[2J\033[H")) // Limpa a tela para a sub-view
 			ui.DrawCyberBanner(conn)
@@ -166,8 +183,13 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
+//Inicia o socket, realiza a conexão e passa ela na função handleConnection como um goroutine
 func main() {
 	fmt.Println("Iniciando o servidor TCP na porta 2222...")
+
+	bytes := []byte("Sequencia randominca de bytes")
+
+	fmt.Println("Sequência characters transformada em bytes", bytes)
 
 	listener, err := net.Listen("tcp", ":2222")
 	if err != nil {
