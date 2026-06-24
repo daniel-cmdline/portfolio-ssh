@@ -1,2 +1,5 @@
 portfolio-ssh
 .env
+# SSH Host Keys locais do Servidor Go
+id_rsa
+id_rsa.pub
