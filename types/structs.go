@@ -10,7 +10,7 @@ type Profile struct {
 	Age            int
 	Role           string
 	Education      string
-	Stack          []string //nolint:revive
+	Stack          []string
 	Certifications []string
-	Projects       []Project // FIX: Usando o tipo correto do pacote ui
+	Projects       []Project 
 }

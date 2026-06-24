@@ -24,12 +24,6 @@ type GitHubRepo struct {
 	Stargazers  int    `json:"stargazers_count"`
 }
 
-type UIProject struct {
-	Name        string
-	Description string
-	TechStack   []string
-}
-
 // Escreve devagar no terminal, aceita um objeto com a assinatura do io.Writer, o texto e o delay
 func Typewriter(w io.Writer, text string, delay time.Duration) {
 	for _, char := range text {
@@ -165,23 +159,23 @@ func DrawProjects(w io.Writer, projects []types.Project) {
 func FetchAndDrawGitHub(w io.Writer, username string) {
 	w.Write([]byte("\033[1;33m[!] CONNECTING TO CORE GITHUB API NODE...\033[0m\r\n"))
 	client := &http.Client{Timeout: 6 * time.Second}
-	respUser, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s", username))
-	if err != nil || respUser.StatusCode != 200 {
+	userResponse, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s", username))
+	if err != nil || userResponse.StatusCode != 200 {
 		w.Write([]byte("\033[1;31m[💥] ERROR: UNABLE TO FETCH USER NODE\033[0m\r\n"))
 		return
 	}
-	defer respUser.Body.Close()
+	defer userResponse.Body.Close()
 	var user GitHubUser
-	json.NewDecoder(respUser.Body).Decode(&user)
+	json.NewDecoder(userResponse.Body).Decode(&user)
 
-	respRepos, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s/repos?sort=updated&per_page=3", username))
-	if err != nil || respRepos.StatusCode != 200 {
+	repoResponse, err := client.Get(fmt.Sprintf("https://api.github.com/users/%s/repos?sort=updated&per_page=3", username))
+	if err != nil || repoResponse.StatusCode != 200 {
 		w.Write([]byte("\033[1;31m[💥] ERROR: UNABLE TO FETCH REPOSITORIES NODE\033[0m\r\n"))
 		return
 	}
-	defer respRepos.Body.Close()
+	defer repoResponse.Body.Close()
 	var repos []GitHubRepo
-	json.NewDecoder(respRepos.Body).Decode(&repos)
+	json.NewDecoder(repoResponse.Body).Decode(&repos)
 
 	w.Write([]byte("\033[1;32m[✓] SECTOR SYNCHRONIZED! RENDERING DATAFEED...\033[0m\r\n\r\n"))
 	w.Write([]byte("\033[1;36m┌── [ GITHUB REMOTE TELEMETRY ] ──────────────────────────────────────────────────┐\033[0m\r\n"))
