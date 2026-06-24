@@ -39,7 +39,7 @@ func getMyProfile() Profile {
 
 	return Profile{
 		Name:      "Daniel Caesar Mantilha",
-		Age:       38,
+		Age:       34,
 		Role:      "Systems & Full-Stack Software Engineer // Network Engineer",
 		Education: "Sistemas de Informação (Foco em Engenharia de Software)",
 		Stack: []string{
@@ -134,27 +134,32 @@ func handleSSHChannel(ch ssh.Channel, requests <-chan *ssh.Request) {
 				ui.DrawProjects(ch, profile.Projects)
 			
 			case 3: // Comms Window (Integração Resend)
-				ui.DrawCommsEnvelopeTop(ch)
-				name := input.ReadLine(ch, reader, "         \033[1;33m│\033[0m  \033[1;32mFROM (NOME):\033[0m ")
-				ch.Write([]byte("         \033[1;33m│\033[0m                                                             \033[1;33m│\033[0m\r\n"))
-				contact := input.ReadLine(ch, reader, "         \033[1;33m│\033[0m  \033[1;32mUP-LINK (EMAIL/LINK):\033[0m ")
-				ch.Write([]byte("         \033[1;33m│\033[0m                                                             \033[1;33m│\033[0m\r\n"))
-				ch.Write([]byte("         \033[1;33m├─────────────────────────────────────────────────────────────┤\033[0m\r\n"))
-				ch.Write([]byte("         \033[1;33m│\033[0m  \033[1;36mPAYLOAD (MENSAGEM):\033[0m                                         \033[1;33m│\033[0m\r\n"))
-				msg := input.ReadLine(ch, reader, "         \033[1;33m│\033[0m  ➔  ")
-				ui.DrawCommsEnvelopeBottom(ch)
+                ui.DrawCommsEnvelopeTop(ch)
+                // Passa 0 no fim: nome não precisa quebrar linha
+                name := input.ReadLine(ch, reader, "         \033[1;33m│\033[0m  \033[1;32mFROM (NOME):\033[0m ", 0)
+                ch.Write([]byte("         \033[1;33m│\033[0m                                                             \033[1;33m│\033[0m\r\n"))
+                
+                // Passa 0 no fim: contato também não precisa quebrar
+                contact := input.ReadLine(ch, reader, "         \033[1;33m│\033[0m  \033[1;32mUP-LINK (EMAIL/LINK):\033[0m ", 0)
+                ch.Write([]byte("         \033[1;33m│\033[0m                                                             \033[1;33m│\033[0m\r\n"))
+                ch.Write([]byte("         \033[1;33m├─────────────────────────────────────────────────────────────┤\033[0m\r\n"))
+                ch.Write([]byte("         \033[1;33m│\033[0m  \033[1;36mPAYLOAD (MENSAGEM):\033[0m                                         \033[1;33m│\033[0m\r\n"))
+                
+                // Passa 50: limita o tamanho da linha interna da caixa do envelope!
+                msg := input.ReadLine(ch, reader, "         \033[1;33m│\033[0m  ➔  ", 50)
+                ui.DrawCommsEnvelopeBottom(ch)
 
-				ch.Write([]byte("\r\n\r\n  \033[1;31m[!] SEALING ENVELOPE... \033[0m\r\n"))
-				time.Sleep(400 * time.Millisecond)
-				ch.Write([]byte("  \033[1;36m[*] DISPATCHING PACKETS VIA SECURE HTTP POST... \033[0m"))
+                ch.Write([]byte("\r\n\r\n  \033[1;31m[!] SEALING ENVELOPE... \033[0m\r\n"))
+                time.Sleep(400 * time.Millisecond)
+                ch.Write([]byte("  \033[1;36m[*] DISPATCHING PACKETS VIA SECURE HTTP POST... \033[0m"))
 
-				err := api.SendContact(name, contact, msg)
-				if err != nil {
-					ch.Write([]byte(fmt.Sprintf("\r\n\r\n  \033[1;31m[!] TRANSMISSION FAILURE: %v\033[0m\r\n", err)))
-				} else {
-					ch.Write([]byte("\r\n\r\n  \033[1;32m[+] SUCCESS: MAIL SENT DIRECTLY TO DANIEL'S CORE HANDSET.\033[0m\r\n"))
-				}
-				ch.Write([]byte("\033[1;30m  ─────────────────────────────────────────────────────────────────────────────────\033[0m\r\n"))
+                err := api.SendContact(name, contact, msg)
+                if err != nil {
+                    ch.Write([]byte(fmt.Sprintf("\r\n\r\n  \033[1;31m[!] TRANSMISSION FAILURE: %v\033[0m\r\n", err)))
+                } else {
+                    ch.Write([]byte("\r\n\r\n  \033[1;32m[+] SUCCESS: MAIL SENT DIRECTLY TO DANIEL'S CORE HANDSET.\033[0m\r\n"))
+                }
+                ch.Write([]byte("\033[1;30m  ─────────────────────────────────────────────────────────────────────────────────\033[0m\r\n"))
 			
 			case 4: // Sair
 				ch.Write([]byte("\033[1;31m\r\n[!] TERMINATING CRYPTO SESSION... BYE.\r\n\033[0m"))
@@ -195,7 +200,7 @@ func main() {
 	}
 
 	fmt.Printf("Iniciando Servidor Criptografado SSH na porta %s...\n", port)
-	listener, err := net.Listen("tcp", ":"+port)
+	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		log.Fatalf("Erro crítico ao abrir socket TCP na porta %s: %v", port, err)
 	}
