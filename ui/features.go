@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"portfolio-ssh/types"
 )
 
 type GitHubUser struct {
@@ -28,7 +30,7 @@ type UIProject struct {
 	TechStack   []string
 }
 
-// Escreve devagar no terminal, aceita o io.Writer, o texto e o delay
+// Escreve devagar no terminal, aceita um objeto com a assinatura do io.Writer, o texto e o delay
 func Typewriter(w io.Writer, text string, delay time.Duration) {
 	for _, char := range text {
 		w.Write([]byte(string(char)))
@@ -54,25 +56,25 @@ func DrawMatrixIntro(w io.ReadWriter) {
 	Typewriter(w, greenNeon+" Follow the white rabbit.\r\n\r\n"+reset, 320*time.Millisecond)
 	time.Sleep(2000 * time.Millisecond)
 	whiteRabbitASCII := "" +
-        "              (`.         ,-,\r\n" +
-        "               `\\ `.    ,;' /\r\n" +
-        "                \\`. \\ ,'/ .'\r\n" +
-        "          __     `.\\ Y /.'\r\n" +
-        "       .-'  ''--.._` ` (\r\n" +
-        "     .'            /   `\r\n" +
-        "    ,           ` '   Q '\r\n" +
-        "    ,         ,   `._    \\\r\n" +
-        "    |         '     `-.;_'\r\n" +
-        "    `  ;    `  ` --,.._;\r\n" +
-        "    `    ,   )   .'\r\n" +
-        "     `._ ,  '   /_\r\n" +
-        "        ; ,''-,;' ``-\r\n" +
-        "         ``-..__\\``--` \r\n"
+		"              (`.         ,-,\r\n" +
+		"               `\\ `.    ,;' /\r\n" +
+		"                \\`. \\ ,'/ .'\r\n" +
+		"          __     `.\\ Y /.'\r\n" +
+		"       .-'  ''--.._` ` (\r\n" +
+		"     .'            /   `\r\n" +
+		"    ,           ` '   Q '\r\n" +
+		"    ,         ,   `._    \\\r\n" +
+		"    |         '     `-.;_'\r\n" +
+		"    `  ;    `  ` --,.._;\r\n" +
+		"    `    ,   )   .'\r\n" +
+		"     `._ ,  '   /_\r\n" +
+		"        ; ,''-,;' ``-\r\n" +
+		"         ``-..__\\``--` \r\n"
 
-    Typewriter(w, whiteColor+whiteRabbitASCII+reset+"\r\n", 10*time.Millisecond)
-    time.Sleep(2500* time.Millisecond)
+	Typewriter(w, whiteColor+whiteRabbitASCII+reset+"\r\n", 10*time.Millisecond)
+	time.Sleep(2500 * time.Millisecond)
 
-	// neoASCII := greenNeon + 
+	// neoASCII := greenNeon +
 	// 	"  ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
 	// 	"  ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
 	// 	"  ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
@@ -114,49 +116,49 @@ func DrawCommsEnvelopeBottom(w io.Writer) {
 
 func DrawAboutMe(w io.Writer, name string, age int, role string, edu string, stack []string, certs []string) {
 	Typewriter(w, "\033[1;36m┌── [ DECRYPTED OPERATIVE DOSSIER ] ──────────────────────────────────────────────┐\033[0m\r\n", 3*time.Millisecond)
-	
+
 	Typewriter(w, fmt.Sprintf("  \033[1;32m⚡ OPERATIVE:\033[0m %s\r\n", name), 8*time.Millisecond)
 	Typewriter(w, fmt.Sprintf("  \033[1;32m⚡ AGE:\033[0m       %d Years Old\r\n", age), 8*time.Millisecond)
 	Typewriter(w, fmt.Sprintf("  \033[1;32m⚡ POSITION:\033[0m  %s\r\n", role), 8*time.Millisecond)
 	Typewriter(w, fmt.Sprintf("  \033[1;32m⚡ ACAD:\033[0m      %s\r\n", edu), 8*time.Millisecond)
-	
+
 	Typewriter(w, "\033[1;36m├── [ CORE OPERATIONS & PROFILE OVERVIEW ] ───────────────────────────────────────┤\033[0m\r\n", 3*time.Millisecond)
-	
+
 	Typewriter(w, "  \033[1;30m[sys/init]\033[0m \033[1;32mNATIVE LINUX USER\033[0m -> Dominio de ambiente Unix, Shell Scripting e automacao.\r\n", 6*time.Millisecond)
 	Typewriter(w, "  \033[1;30m[sys/net] \033[0m \033[1;34mNETWORK INFRASTRUCTURE\033[0m -> Arquitetura de Redes, Protocolos TCP/IP e roteamento.\r\n", 6*time.Millisecond)
 	Typewriter(w, "  \033[1;30m[sys/core]\033[0m \033[1;33mBACKEND SPECIALIST\033[0m -> Construcao de APIs HTTP robustas, servicos em Go e Node.\r\n", 6*time.Millisecond)
 	Typewriter(w, "  \033[1;30m[sys/sync]\033[0m \033[1;35mREAL-TIME SYSTEMS\033[0m -> Implementacao de comunicacao bidirecional via WebSockets.\r\n", 6*time.Millisecond)
 	Typewriter(w, "  \033[1;30m[sys/web] \033[0m \033[1;36mWEB DEVELOPMENT\033[0m -> Engenharia Full-Stack ponta a ponta com TypeScript e React.\r\n", 6*time.Millisecond)
-	
+
 	Typewriter(w, "\033[1;36m├── [ HARDWARE & SOFTWARE STACK ] ────────────────────────────────────────────────┤\033[0m\r\n", 3*time.Millisecond)
 	Typewriter(w, "  \033[1;33m🛠️  TECH RUNTIMES:\033[0m\r\n   ", 8*time.Millisecond)
-	
+
 	for _, tech := range stack {
-		Typewriter(w, "\033[1;30;107m " + tech + " \033[0m ", 4*time.Millisecond)
+		Typewriter(w, "\033[1;30;107m "+tech+" \033[0m ", 4*time.Millisecond)
 	}
-	
+
 	Typewriter(w, "\r\n\r\n  \033[1;35m🎖️  VALIDATED NETWORK & LANG CERTIFICATIONS:\033[0m\r\n", 8*time.Millisecond)
 	for _, cert := range certs {
-		Typewriter(w, "   ➔ \033[1;94m" + cert + "\033[0m\r\n", 8*time.Millisecond)
+		Typewriter(w, "   ➔ \033[1;94m"+cert+"\033[0m\r\n", 8*time.Millisecond)
 	}
-	
+
 	Typewriter(w, "\033[1;36m└─────────────────────────────────────────────────────────────────────────────────┘\r\n", 3*time.Millisecond)
 }
 
-func DrawProjects(w io.Writer, projects []UIProject) {
+func DrawProjects(w io.Writer, projects []types.Project) {
 	Typewriter(w, "\033[1;36m┌── [ LOCAL DATABASE SECTORS - PRODUCTION DEPLOYS ] ─────────────────────────────┐\033[0m\r\n", 4*time.Millisecond)
-	
+
 	for _, p := range projects {
-		Typewriter(w, "  \033[1;33m📁 PROJECT: " + p.Name + "\033[0m\r\n", 10*time.Millisecond)
-		Typewriter(w, "  │  \033[90mDescription:\033[0m " + p.Description + "\r\n", 8*time.Millisecond)
+		Typewriter(w, "  \033[1;33m📁 PROJECT: "+p.Name+"\033[0m\r\n", 10*time.Millisecond)
+		Typewriter(w, "  │  \033[90mDescription:\033[0m "+p.Description+"\r\n", 8*time.Millisecond)
 		Typewriter(w, "  │  \033[90mInfrastructure Stack:\033[0m ", 10*time.Millisecond)
-		
+
 		for _, t := range p.TechStack {
-			Typewriter(w, "\033[1;34m[" + t + "]\033[0m ", 5*time.Millisecond)
+			Typewriter(w, "\033[1;34m["+t+"]\033[0m ", 5*time.Millisecond)
 		}
 		Typewriter(w, "\r\n  │\r\n", 10*time.Millisecond)
 	}
-	
+
 	Typewriter(w, "\033[1;36m└─────────────────────────────────────────────────────────────────────────────────┘\r\n", 4*time.Millisecond)
 }
 
@@ -203,15 +205,15 @@ func FetchAndDrawGitHub(w io.Writer, username string) {
 
 func DrawCyberBanner(w io.Writer) {
 	green := "\033[1;92m"
-	cyan  := "\033[1;96m"
-	gray  := "\033[90m"
+	cyan := "\033[1;96m"
+	gray := "\033[90m"
 	reset := "\033[0m"
 	w.Write([]byte(green + "  ____   _   _   _ ___ _____ _       ____ __  __ ____   _     ___ _   _ _____\r\n" + reset))
 	w.Write([]byte(green + " |  _ \\ /_\\ | \\ | |_ _| ____| |     / ___|  \\/  |  _ \\  | |   |_ _| \\ | | ____|\r\n" + reset))
-	w.Write([]byte(cyan  + " | | | / _ \\|  \\| | | ||  _| | |    | |   | |\\/| | | | | | |    | ||  \\| |  _|  \r\n" + reset))
-	w.Write([]byte(cyan  + " | |_| / ___ \\ |\\  | | || |___| |___ | |___| |  | | |_| | | |___ | || |\\  | |___ \r\n" + reset))
-	w.Write([]byte(cyan  + " |____/_/   \\_\\_| \\_|___|_____|_____| \\____|_|  |_|____/  |_____|___|_| \\_|_____|\r\n" + reset))
-	w.Write([]byte(gray  + "  ─── [ HOST OVERRIDE: DANIEL_CMD_LINE ] ─── v2.0-RAW ─────────────────────────────\r\n\r\n" + reset))
+	w.Write([]byte(cyan + " | | | / _ \\|  \\| | | ||  _| | |    | |   | |\\/| | | | | | |    | ||  \\| |  _|  \r\n" + reset))
+	w.Write([]byte(cyan + " | |_| / ___ \\ |\\  | | || |___| |___ | |___| |  | | |_| | | |___ | || |\\  | |___ \r\n" + reset))
+	w.Write([]byte(cyan + " |____/_/   \\_\\_| \\_|___|_____|_____| \\____|_|  |_|____/  |_____|___|_| \\_|_____|\r\n" + reset))
+	w.Write([]byte(gray + "  ─── [ HOST OVERRIDE: DANIEL_CMD_LINE ] ─── v2.0-RAW ─────────────────────────────\r\n\r\n" + reset))
 }
 
 func DrawStatusBar(w io.Writer, currentOption string) {

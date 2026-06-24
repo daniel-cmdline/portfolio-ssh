@@ -69,10 +69,18 @@ func HandleSSHChannel(ch ssh.Channel, requests <-chan *ssh.Request) {
 			b3, _ := reader.ReadByte()
 			if b2 == 91 {
 				if b3 == 65 { // CIMA
-					if cursor > 0 { cursor-- } else { cursor = len(menuItems) - 1 }
+					if cursor > 0 {
+						cursor--
+					} else {
+						cursor = len(menuItems) - 1
+					}
 				}
 				if b3 == 66 { // BAIXO
-					if cursor < len(menuItems)-1 { cursor++ } else { cursor = 0 }
+					if cursor < len(menuItems)-1 {
+						cursor++
+					} else {
+						cursor = 0
+					}
 				}
 			}
 			continue
