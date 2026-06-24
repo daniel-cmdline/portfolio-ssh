@@ -37,10 +37,9 @@ func getMyProfile() Profile {
 
 	return Profile{
 		Name:      "Daniel Caesar Mantilha",
-		Age:       34,
+		Age:       38,
 		Role:      "Full-Stack Software Engineer & Network Engineer",
-		Education: "Sistemas de Informação - FMU (3º Ano)",
-		// Stack centralizada e sem repetições aqui:
+		Education: "Sistemas de Informação (Foco em Engenharia de Software)",
 		Stack:     []string{"Node.js", "Express", "TypeScript", "React", "Next.js", "Python", "Go", "C", "PostgresSQL", "DrizzleORM"},
 		Certifications: []string{
 			"CCNA (Cisco Certified Network Associate)",
@@ -53,12 +52,18 @@ func getMyProfile() Profile {
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
+	// 🔥 AQUI SIM! Roda a intro da Matrix na conexão TCP do usuário!
+	ui.DrawMatrixIntro(conn)
+
+	// Dá 1.5 segundos para o cara processar o "BOOM" antes do loop limpar a tela
+	time.Sleep(1500 * time.Millisecond)
+
 	profile := getMyProfile()
 	menuItems := []string{
 		"👤 [1] DECRYPT PROFILE (SOBRE MIM)",
-		"🐙 [2] SYNC GITHUB (MEUS PROJETOS PUBLICOS NO GIT)",
-		"💾 [3] ACCESS DATABASE (VISUALIZE MEUS PROJETOS)",
-		"📩 [4] ESTABLISH COMS (ME ENVIE UM EMAIL DIRETO VIA HTTP)",
+		"🐙 [2] SYNC GITHUB NODE (LIVE DATA)",
+		"💾 [3] ACCESS DATABASE (PROJETOS)",
+		"📡 [4] ESTABLISH COMS (ENTRAR EM CONTATO)",
 		"❌ [5] TERMINATE SESSION (SAIR)",
 	}
 	cursor := 0
