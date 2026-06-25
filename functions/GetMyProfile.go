@@ -34,8 +34,8 @@ func GetMyProfile() types.Profile {
 		Role:      "Systems & Full-Stack Software Engineer // Network Engineer",
 		Education: "Sistemas de Informação (Foco em Engenharia de Software)",
 		Stack: []string{
-			"Linux/GNU", "Go (Golang)", "C Lang", "Node.js", "TypeScript",
-			"PostgreSQL", "HTTP/Websockets", "REST APIs", "React/Next.js",
+			"GNU/Linux", "Golang", "Node.js", "TypeScript",
+			"PostgreSQL", "Docker", "HTTP/Websockets", "REST APIs", "React/Next.js", "Python",
 		},
 		Certifications: []string{
 			"CCNA (Cisco Certified Network Associate) - ID: Enterprise & Security Core",
